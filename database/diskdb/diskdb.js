@@ -13,7 +13,7 @@ module.exports = function(config) {
     getUserCount: function() { return db.users.count(); },
     
     getItemsByOwner(userId) { return db.items.find({user_id: userId}); },
-    getItemByIdAndOwner(itemId, userId) { return db.items.find({user_id: userId, _id: itemId}); },
+    getItemByIdAndOwner(itemId, userId) { return db.items.findOne({user_id: userId, _id: itemId}); },
     createItem: function(item) { db.items.save(item); },
     updateItem: function(item) { db.items.update({_id: item._id}, item); },
     deleteItem: function(itemId) { db.items.remove({_id: itemId}); },

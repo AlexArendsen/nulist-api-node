@@ -2,12 +2,12 @@ const userUtils = require('../services/users');
 
 module.exports = function(server, config, db) {
 
-  const _setChecked = function(request, response, next, checked) {
+  const _setChecked = async function(request, response, next, checked) {
     const user = userUtils.getUserFromRestifyRequest(request, db);
     const item = db.getItemByIdAndOwner(request.params.id, user._id);
 
     if (!item) return next(new Error('No item with given ID belongs to current user'));
-    db.setItemChecked(item._id, checked);
+    await db.setItemChecked(item._id, checked);
 
     response.send(item)
     next();
@@ -16,10 +16,10 @@ module.exports = function(server, config, db) {
   return {
 
     // GET: /items
-    mine: function(request, response, next) {
+    mine: async function(request, response, next) {
       try {
-        const user = userUtils.getUserFromRestifyRequest(request, db);
-        response.send(db.getItemsByOwner(user._id))
+        const user = await userUtils.getUserFromRestifyRequest(request, db);
+        response.send(await db.getItemsByOwner(user._id))
       } catch (e) {
         response.send([]);
       }
@@ -27,8 +27,8 @@ module.exports = function(server, config, db) {
     },
 
     // POST: /item
-    create: function(request, response, next) {
-      const user = userUtils.getUserFromRestifyRequest(request, db);
+    create: async function(request, response, next) {
+      const user = await userUtils.getUserFromRestifyRequest(request, db);
       const item = {
         title: request.body.title,
         description: request.body.description,
@@ -36,15 +36,16 @@ module.exports = function(server, config, db) {
         user_id: user._id,
         checked: false
       };
-      db.createItem(item);
+
+      await db.createItem(item);
       response.send(item);
       next();
     },
 
     // PUT: /item
-    update: function(request, response, next) {
-      const user = userUtils.getUserFromRestifyRequest(request, db);
-      const item = db.getItemByIdAndOwner(request.body._id, user._id);
+    update: async function(request, response, next) {
+      const user = await userUtils.getUserFromRestifyRequest(request, db);
+      const item = await db.getItemByIdAndOwner(request.body._id, user._id);
 
       if (!item) return next(new Error('No such item found'));
 
@@ -52,23 +53,23 @@ module.exports = function(server, config, db) {
       if(request.body.description) item.description = request.body.description;
       if(request.body.parent_id) item.parent_id = request.body.parent_id;
 
-      db.udpateItem(item);
+      await db.updateItem(item);
       response.send(item);
 
       next();
     },
 
     // PUT: /item/:id/(un)check
-    check: function(request, response, next) { _setChecked(request, response, next, true); },
-    uncheck: function(request, response, next) { _setChecked(request, response, next, false); },
+    check: async function(request, response, next) { await _setChecked(request, response, next, true); },
+    uncheck: async function(request, response, next) { await _setChecked(request, response, next, false); },
 
     // DELETE: /item/:id
-    delete: function(request, response, next) {
-      const user = userUtils.getUserFromRestifyRequest(request, db);
-      const item = db.getItemByIdAndOwner(request.params.id, user._id);
+    delete: async function(request, response, next) {
+      const user = await userUtils.getUserFromRestifyRequest(request, db);
+      const item = await db.getItemByIdAndOwner(request.params.id, user._id);
       if (!item) next(new Error('No item with given ID is owned by current user'));
 
-      db.deleteItem(request.params.id);
+      await db.deleteItem(request.params.id);
       response.send(item);
       next();
     }
