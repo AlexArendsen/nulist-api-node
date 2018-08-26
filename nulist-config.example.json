@@ -1,5 +1,11 @@
 {
   "port": 8080,
+  "databaseDriver": "database/diskdb/diskdb.js",
+  "database": {
+    "diskdb": {
+      "path": "./data"
+    }
+  },
   "jwt": {
     "secret": "put-a-secret-here"
   }

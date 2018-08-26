@@ -1,6 +1,5 @@
 // Imports
 const restify = require('restify');
-const diskdb = require('diskdb');
 const fs = require('fs');
 
 // Actual constants
@@ -9,7 +8,7 @@ const CONFIG_FILE = './nulist-config.json';
 // Globals
 var server;  // Restify server instance
 var config;  // POJO config object from CONFIG_FILE
-var db;      // DiskDB db connection instance
+var db;      // DB implementation
 
 // "Controllers"
 var users;
@@ -20,9 +19,7 @@ function configure() {
   catch (e) {console.warn(`Warning, could not read file ${CONFIG_FILE}`);}
 
   // Configure database
-  db = diskdb.connect('./data', [
-    'users', 'items'
-  ]);
+  db = require(config.databaseDriver)(config);
 
   // Configure server
   server = restify.createServer();

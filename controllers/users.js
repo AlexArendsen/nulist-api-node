@@ -11,14 +11,14 @@ module.exports = function(server, config, db) {
       if (!request.body.username)
         return next(new Error('No username provided'));
 
-      if (db.users.findOne({username: request.body.username}))
+      if (db.getUserByUsername(request.body.username))
         return next(new Error('Username already taken'));
 
       if (!request.body.password)
         return next(new Error('No password provided'));
 
       const onSuccess = (hash) => {
-        db.users.save({ username: request.body.username, password: hash });
+        db.createUser(request.body.username, hash);
         response.send({token: jwt.sign({username: request.body.username}, config.jwt.secret)})
         next();
       }
@@ -31,7 +31,7 @@ module.exports = function(server, config, db) {
       if (!request.body.username) return next(new Error('No username provided'));
       if (!request.body.password) return next(new Error('No password provided'));
 
-      const user = db.users.findOne({username: request.body.username});
+      const user = db.getUserByUsername(request.body.username);
       if (!user) return next(new Error('Invalid login'));
 
       const onComplete = (err, result) => {
@@ -54,13 +54,13 @@ module.exports = function(server, config, db) {
 
     // GET: /all
     all: function(request, response, next) {
-      response.send(db.users.find());
+      response.send(db.getAllUsers());
       next();
     },
 
     // GET: /count
     count: function(request, response, next) {
-      response.send(db.users.count());
+      response.send(db.getUserCount());
       next();
     }
 

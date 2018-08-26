@@ -7,7 +7,7 @@ module.exports = {
 
     const decoded = jwt.decode(request.headers.authorization);
     if (!decoded || !decoded.username) reject();
-    const user = db.users.findOne({username: decoded.username});
+    const user = db.getUserByUsername(decoded.username);
     return user || reject();
   }
 

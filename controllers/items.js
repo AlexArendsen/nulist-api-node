@@ -4,10 +4,11 @@ module.exports = function(server, config, db) {
 
   const _setChecked = function(request, response, next, checked) {
     const user = userUtils.getUserFromRestifyRequest(request, db);
-    const item = db.items.findOne({_id: request.params.id, user_id: user._id});
+    const item = db.getItemByIdAndOwner(request.params.id, user._id);
+
     if (!item) return next(new Error('No item with given ID belongs to current user'));
-    item.checked = checked;
-    db.items.update({_id: request.params.id}, {checked});
+    db.setItemChecked(item._id, checked);
+
     response.send(item)
     next();
   }
@@ -18,7 +19,7 @@ module.exports = function(server, config, db) {
     mine: function(request, response, next) {
       try {
         const user = userUtils.getUserFromRestifyRequest(request, db);
-        response.send(db.items.find({user_id: user._id}))
+        response.send(db.getItemsByOwner(user._id))
       } catch (e) {
         response.send([]);
       }
@@ -35,7 +36,7 @@ module.exports = function(server, config, db) {
         user_id: user._id,
         checked: false
       };
-      db.items.save(item);
+      db.createItem(item);
       response.send(item);
       next();
     },
@@ -43,7 +44,7 @@ module.exports = function(server, config, db) {
     // PUT: /item
     update: function(request, response, next) {
       const user = userUtils.getUserFromRestifyRequest(request, db);
-      const item = db.items.findOne({_id: request.body._id, user_id: user._id});
+      const item = db.getItemByIdAndOwner(request.body._id, user._id);
 
       if (!item) return next(new Error('No such item found'));
 
@@ -51,7 +52,7 @@ module.exports = function(server, config, db) {
       if(request.body.description) item.description = request.body.description;
       if(request.body.parent_id) item.parent_id = request.body.parent_id;
 
-      db.items.update({_id: request.body._id}, item);
+      db.udpateItem(item);
       response.send(item);
 
       next();
@@ -64,10 +65,10 @@ module.exports = function(server, config, db) {
     // DELETE: /item/:id
     delete: function(request, response, next) {
       const user = userUtils.getUserFromRestifyRequest(request, db);
-      const item = db.items.findOne({_id: request.params.id, user_id: user._id});
+      const item = db.getItemByIdAndOwner(request.params.id, user._id);
       if (!item) next(new Error('No item with given ID is owned by current user'));
 
-      db.items.remove({_id: request.params.id});
+      db.deleteItem(request.params.id);
       response.send(item);
       next();
     }
