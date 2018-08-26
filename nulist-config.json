@@ -1,0 +1,15 @@
+{
+  "port": 8080,
+  "databaseDriver": "./database/mongodb/mongodb.js",
+  "database": {
+    "diskdb": {
+      "path": "./data"
+    },
+    "mongodb": {
+      "protocol": "mongodb+srv",
+      "host": "nulist-production-m4gdl.mongodb.net",
+      "database": "nulist-production",
+      "path": "test?retryWrites=true"
+    }
+  }
+}
