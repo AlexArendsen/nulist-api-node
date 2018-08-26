@@ -1,0 +1,17 @@
+{
+  "name": "nulist-api-node",
+  "version": "1.0.0",
+  "description": "NuList API (on-disk Node.JS version)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Alex Arendsen",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^3.0.0",
+    "diskdb": "^0.1.17",
+    "jsonwebtoken": "^8.3.0",
+    "restify": "^7.2.1"
+  }
+}
