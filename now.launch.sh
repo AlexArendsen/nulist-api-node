@@ -9,7 +9,7 @@
 # export MONGODB_USER=nulist
 # export MONGODB_SECRET=PasswordForNulistMongoUser
 
-export ./.env.production
+source ./.env.production
 
 # Have to do this since we're using the OSS plan and we don't want our
 # secrets on display for the world to see
