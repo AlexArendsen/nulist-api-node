@@ -1,6 +1,7 @@
 // Imports
 const restify = require('restify');
 const fs = require('fs');
+const respond = require('./services/respond');
 
 // Actual constants
 const CONFIG_FILE = './nulist-config.json';
@@ -30,8 +31,11 @@ function makeControllers() {
 }
 
 function drawRoutes() {
-  // App endpoints
-  server.get('/*', restify.plugins.serveStatic({ directory: './app-ng6/', default: 'index.html' }))
+  // Angular resources
+  server.get('/app-ng6/*', restify.plugins.serveStatic({ directory: './app-ng6', appendRequestPath: false }))
+
+  // Anything else should get the index page
+  server.get('/*', (req, res, next) => respond.withHtml('./app-ng6/index.html', res, next) )
 }
 
 function main() {
