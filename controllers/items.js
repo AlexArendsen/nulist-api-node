@@ -3,8 +3,8 @@ const userUtils = require('../services/users');
 module.exports = function(server, config, db) {
 
   const _setChecked = async function(request, response, next, checked) {
-    const user = userUtils.getUserFromRestifyRequest(request, db);
-    const item = db.getItemByIdAndOwner(request.params.id, user._id);
+    const user = await userUtils.getUserFromRestifyRequest(request, db);
+    const item = await db.getItemByIdAndOwner(request.params.id, user._id);
 
     if (!item) return next(new Error('No item with given ID belongs to current user'));
     await db.setItemChecked(item._id, checked);

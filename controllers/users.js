@@ -31,21 +31,23 @@ module.exports = function(server, config, db) {
       const result = await bcrypt.compare(request.body.password, user.password);
       if (!result) return next(new Error('Invalid login'));
 
-      response.send({token: jwt.sign({username: request.body.username}, config.jwt.secret)})
+      response.send({token: jwt.sign({username: request.body.username}, process.env.JWT_SECRET)})
       next();
 
     },
 
     // GET: /me
     me: async function(request, response, next) {
-      try { response.send(await userUtils.getUserFromRestifyRequest(request, db)); }
+      const user = await userUtils.getUserFromRestifyRequest(request, db);
+      try { response.send(Object.assign(user, {password: ''})); }
       catch (e) {response.send(null)}
       next();
     },
 
     // GET: /all
+    // Deprected
     all: async function(request, response, next) {
-      response.send(await db.getAllUsers());
+      response.send([]);
       next();
     },
 
