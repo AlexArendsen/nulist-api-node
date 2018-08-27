@@ -15,6 +15,18 @@ module.exports = function(server, config, db) {
 
   return {
 
+    registerRoutes: function() {
+
+      // Item routes
+      server.get('/api/items', this.mine);
+      server.post('/api/item', this.create);
+      server.put('/api/item', this.update);
+      server.put('/api/item/:id/check', this.check);
+      server.put('/api/item/:id/uncheck', this.uncheck);
+      server.del('/api/item/:id', this.delete);
+
+    },
+
     // GET: /items
     mine: async function(request, response, next) {
       try {

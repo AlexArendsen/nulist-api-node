@@ -5,6 +5,17 @@ const bcrypt = require('bcrypt')
 module.exports = function(server, config, db) {
   return {
 
+    registerRoutes: function() {
+
+      // User routes
+      server.post('/api/register', this.register);
+      server.post('/api/login', this.login);
+      server.get('/api/me', this.me);
+      server.get('/api/all', this.all); // Deprecated
+      server.get('/api/count', this.count);
+
+    },
+
     // POST: /register
     register: async function(request, response, next) {
 
