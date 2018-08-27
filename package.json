@@ -6,6 +6,11 @@
   "scripts": {
     "start": "node index.js"
   },
+  "env": {
+    "JWT_SECRET": "@jwt-secret",
+    "MONGODB_USER": "nulist",
+    "MONGODB_SECRET": "@mongodb-secret"
+  },
   "author": "Alex Arendsen",
   "license": "MIT",
   "dependencies": {
