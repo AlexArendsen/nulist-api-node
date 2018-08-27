@@ -15,7 +15,7 @@ module.exports = function(server, config, db) {
 
   return {
 
-    registerRoutes: function() {
+    registerRoutes() {
 
       // Item routes
       server.get('/api/items', this.mine);
@@ -28,7 +28,7 @@ module.exports = function(server, config, db) {
     },
 
     // GET: /items
-    mine: async function(request, response, next) {
+    async mine(request, response, next) {
       try {
         const user = await userUtils.getUserFromRestifyRequest(request, db);
         response.send(await db.getItemsByOwner(user._id))
@@ -39,7 +39,7 @@ module.exports = function(server, config, db) {
     },
 
     // POST: /item
-    create: async function(request, response, next) {
+    async create(request, response, next) {
       const user = await userUtils.getUserFromRestifyRequest(request, db);
       const item = {
         title: request.body.title,
@@ -55,7 +55,7 @@ module.exports = function(server, config, db) {
     },
 
     // PUT: /item
-    update: async function(request, response, next) {
+    async update(request, response, next) {
       const user = await userUtils.getUserFromRestifyRequest(request, db);
       const item = await db.getItemByIdAndOwner(request.body._id, user._id);
 
@@ -72,11 +72,11 @@ module.exports = function(server, config, db) {
     },
 
     // PUT: /item/:id/(un)check
-    check: async function(request, response, next) { await _setChecked(request, response, next, true); },
-    uncheck: async function(request, response, next) { await _setChecked(request, response, next, false); },
+    async check(request, response, next) { await _setChecked(request, response, next, true); },
+    async uncheck(request, response, next) { await _setChecked(request, response, next, false); },
 
     // DELETE: /item/:id
-    delete: async function(request, response, next) {
+    async delete(request, response, next) {
       const user = await userUtils.getUserFromRestifyRequest(request, db);
       const item = await db.getItemByIdAndOwner(request.params.id, user._id);
       if (!item) next(new Error('No item with given ID is owned by current user'));

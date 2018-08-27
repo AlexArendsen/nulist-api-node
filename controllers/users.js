@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt')
 module.exports = function(server, config, db) {
   return {
 
-    registerRoutes: function() {
+    registerRoutes() {
 
       // User routes
       server.post('/api/register', this.register);
@@ -17,7 +17,7 @@ module.exports = function(server, config, db) {
     },
 
     // POST: /register
-    register: async function(request, response, next) {
+    async register(request, response, next) {
 
       if (!request.body.username) return next(new Error('No username provided'));
       if (await db.getUserByUsername(request.body.username)) return next(new Error('Username already taken'));
@@ -32,7 +32,7 @@ module.exports = function(server, config, db) {
     },
 
     // POST: /login
-    login: async function(request, response, next) {
+    async login(request, response, next) {
       if (!request.body.username) return next(new Error('No username provided'));
       if (!request.body.password) return next(new Error('No password provided'));
 
@@ -48,7 +48,7 @@ module.exports = function(server, config, db) {
     },
 
     // GET: /me
-    me: async function(request, response, next) {
+    async me(request, response, next) {
       const user = await userUtils.getUserFromRestifyRequest(request, db);
       try { response.send(Object.assign(user, {password: ''})); }
       catch (e) {response.send(null)}
@@ -57,13 +57,13 @@ module.exports = function(server, config, db) {
 
     // GET: /all
     // Deprected
-    all: async function(request, response, next) {
+    async all(request, response, next) {
       response.send([]);
       next();
     },
 
     // GET: /count
-    count: async function(request, response, next) {
+    async count(request, response, next) {
       response.send(await db.getUserCount());
       next();
     }
