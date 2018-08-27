@@ -6,17 +6,13 @@ const fs = require('fs');
 const CONFIG_FILE = './nulist-config.json';
 
 // Globals
-var server;  // Restify server instance
-var config;  // POJO config object from CONFIG_FILE
-var db;      // DB implementation
-
-// "Controllers"
-var users;
-var items;
+let server;  // Restify server instance
+let config;  // POJO config object from CONFIG_FILE
+let db;      // DB implementation
 
 function configure() {
   try { config = JSON.parse(fs.readFileSync(CONFIG_FILE)); }
-  catch (e) {console.warn(`Warning, could not read file ${CONFIG_FILE}`);}
+  catch (e) {console.warn(`Warning, could not read file ${CONFIG_FILE}`, e);}
 
   // Configure database
   db = require(config.databaseDriver)(config);
