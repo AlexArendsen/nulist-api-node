@@ -83,7 +83,17 @@ module.exports = function(config) {
       });
     },
 
-    async deleteItem(itemId) { /* Not yet implemented */ },
+    async deleteItem(itemId) {
+      return await query(async (db) => {
+        const items = db.collection('items');
+        const deleted = db.collection('deletedItems');
+
+        const item = await items.findOne({ _id: new ObjectId(itemId) });
+        items.deleteOne({ _id: new ObjectId(itemId) });
+        deleted.insertOne(item);
+        return item;
+      });
+    },
 
     async setItemChecked(itemId, checked) {
       return await query(async (db) => {
