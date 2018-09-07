@@ -19,5 +19,8 @@
     "jsonwebtoken": "^8.3.0",
     "mongodb": "^3.1.4",
     "restify": "^7.2.1"
+  },
+  "devDependencies": {
+    "opn": "^5.3.0"
   }
 }
