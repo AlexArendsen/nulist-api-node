@@ -29,6 +29,7 @@ module.exports = function(config) {
 
   return {
 
+    // ====== User Methods
     async createUser(username, passwordHash) {
       return await query(async (db) => {
         const users = db.collection('users');
@@ -54,9 +55,15 @@ module.exports = function(config) {
     async getUserCount() {
       return await query(async (db) => await db.collection('users').count());
     },
+
+    async updateUser(userId, changes) {
+      await query(async (db) => await db.collection('users')
+        .updateOne({ _id: new ObjectId(userId)}, {$set: changes}))
+      return await this.getUserById(userId);
+    },
     
 
-
+    // ====== Item Methods
     async getItemsByOwner(userId) {
       return await query(async (db) => await db.collection('items')
         .find({user_id: new ObjectId(userId)}).toArray());
@@ -100,6 +107,32 @@ module.exports = function(config) {
         const items = db.collection('items');
         await items.updateOne({ _id: new ObjectId(itemId) }, {$set: {checked: checked}});
         return await items.findOne({ _id: new ObjectId(itemId)});
+      });
+    },
+
+    // ====== Metadata Methods
+    async getMetadata() {
+      return await query(async (db) => {
+        const fields = ['appName', 'appVersion', 'appUrl'];
+        const projection = fields.reduce((obj, field) => Object.assign(obj, {[field]: 1}), {});
+        const data = await db.collection('metadata').findOne({}, {projection: projection});
+        return data || {};
+      });
+    },
+
+    async updateMetadata(changes) {
+      return await query(async (db) => {
+        await db.collection('metadata').updateOne({}, {$set: changes});
+        return await this.getMetadata();
+      });
+    },
+
+    async initializeMetadata() {
+      return await query(async (db) => {
+        const init = {appName: 'NuList', appVersion: '0.0.0', appUrl: 'https://nulist-api-node-rnbhskspux.now.sh'};
+        await db.collection('metadata').deleteMany({});
+        await db.collection('metadata').insertOne(init);
+        return await this.getMetadata();
       });
     }
 

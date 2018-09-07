@@ -26,7 +26,8 @@ function configure() {
 function makeControllers() {
   return [
     require('./controllers/users')(server, config, db),
-    require('./controllers/items')(server, config, db)
+    require('./controllers/items')(server, config, db),
+    require('./controllers/metadata')(server, config, db)
   ];
 }
 
