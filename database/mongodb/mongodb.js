@@ -53,7 +53,7 @@ module.exports = function(config) {
     },
 
     async getUserCount() {
-      return await query(async (db) => await db.collection('users').count());
+      return await query(async (db) => `${await db.collection('users').countDocuments()}`);
     },
 
     async updateUser(userId, changes) {
