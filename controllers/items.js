@@ -63,7 +63,7 @@ module.exports = function(server, config, db) {
 
       if(request.body.title) item.title = request.body.title;
       if(request.body.description !== undefined) item.description = request.body.description;
-      if(request.body.parent_id) item.parent_id = request.body.parent_id;
+      if(request.body.parent_id !== undefined) item.parent_id = request.body.parent_id;
 
       await db.updateItem(item);
       response.send(item);
