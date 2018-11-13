@@ -62,7 +62,7 @@ module.exports = function(server, config, db) {
       if (!item) return next(new Error('No such item found'));
 
       if(request.body.title) item.title = request.body.title;
-      if(request.body.description) item.description = request.body.description;
+      if(request.body.description !== undefined) item.description = request.body.description;
       if(request.body.parent_id) item.parent_id = request.body.parent_id;
 
       await db.updateItem(item);
