@@ -45,6 +45,7 @@ module.exports = function(server, config, db) {
         title: request.body.title,
         description: request.body.description,
         parent_id: request.body.parent_id || undefined,
+        created_at: new Date(),
         user_id: user._id,
         checked: false
       };
