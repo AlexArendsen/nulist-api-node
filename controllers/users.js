@@ -26,7 +26,6 @@ module.exports = function(server, config, db) {
       const hash = await bcrypt.hash(request.body.password, 8);
       const user = await db.createUser(request.body.username, hash);
 
-      console.log('Finished creating user with result:', user);
       response.send({token: jwt.sign({username: user.username}, process.env.JWT_SECRET)})
       next();
     },
