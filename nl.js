@@ -10,6 +10,11 @@ const cli = {
     console.log(jwt.sign({username: username}, process.env.JWT_SECRET));
   },
 
+  'get-user': async function(username) {
+    const user = await db.getUserByUsername(username);
+    console.log(user);
+  },
+
   'get-meta': async function() {
     console.log('Fetching metadata');
     console.log(await db.getMetadata());
@@ -24,6 +29,22 @@ const cli = {
   'open': async function() {
     const meta = await db.getMetadata();
     opn(meta.appUrl);
+  },
+
+  'get-deleted-items': async function(userId) {
+    const items = await db.getDeletedItemsByOwner(userId);
+    items.reverse();
+    console.log(items);
+  },
+
+  'search-items': async function(userId, query) {
+    const items = (await db.getItemsByOwner(userId)).filter(i => i.title.indexOf(query) !== -1);
+    items.reverse();
+    console.log(items);
+  },
+  
+  'undelete-item': async function(itemId) {
+    console.log(await db.undeleteItem(itemId));
   }
 
 };

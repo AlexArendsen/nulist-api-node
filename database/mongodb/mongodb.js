@@ -102,11 +102,30 @@ module.exports = function(config) {
       });
     },
 
+    async undeleteItem(itemId) {
+      return await query(async (db) => {
+        const items = db.collection('items');
+        const deleted = db.collection('deletedItems');
+
+        const item = await deleted.findOne({ _id: new ObjectId(itemId) });
+        deleted.deleteOne({ _id: new ObjectId(itemId) });
+        items.insertOne(item);
+        return item;
+      });
+    },
+
     async setItemChecked(itemId, checked) {
       return await query(async (db) => {
         const items = db.collection('items');
         await items.updateOne({ _id: new ObjectId(itemId) }, {$set: {checked: checked}});
         return await items.findOne({ _id: new ObjectId(itemId)});
+      });
+    },
+
+    async getDeletedItemsByOwner(userId) {
+      return await query(async (db) => {
+        const items = db.collection('deletedItems');
+        return await items.find({user_id: new ObjectId(userId)}).toArray();
       });
     },
 
