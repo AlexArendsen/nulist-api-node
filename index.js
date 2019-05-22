@@ -2,6 +2,7 @@
 const restify = require('restify');
 const fs = require('fs');
 const respond = require('./services/respond');
+const corsMiddleware = require('restify-cors-middleware');
 
 // Actual constants
 const CONFIG_FILE = './nulist-config.json';
@@ -18,8 +19,13 @@ function configure() {
   // Configure database
   db = require(config.databaseDriver)(config);
 
+  // Configure cors
+  cors = corsMiddleware({ origins: ['*'], allowHeaders: ['Authorization'], exposeHeaders: ['Access-Control-Allow-Headers'] });
+
   // Configure server
   server = restify.createServer();
+  server.pre(cors.preflight)
+  server.use(cors.actual)
   server.use(restify.plugins.bodyParser({mapParams: true}));
 }
 
