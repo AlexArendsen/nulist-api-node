@@ -74,6 +74,14 @@ module.exports = function(config) {
         .findOne({user_id: new ObjectId(userId), _id: new ObjectId(itemId)}));
     },
 
+    async getItemsByIdsAndOwner(itemIds, userId) {
+      return await query(async (db) => await db.collection('items')
+        .find({
+          user_id: new ObjectId(userId),
+          _id: { $in: itemIds.map(id => new ObjectId(id)) }
+        }).toArray());
+    },
+
     async createItem(item) {
       return await query(async (db) => {
         const items = db.collection('items');
@@ -90,6 +98,17 @@ module.exports = function(config) {
       });
     },
 
+    async updateManyItems(itemIds, change) {
+      console.log('I got these items IDs')
+      console.log(itemIds)
+      return await query(async (db) => {
+        const items = db.collection('items')
+        const condition = { _id: { $in: itemIds.map(i => new ObjectId(i)) } }
+        await items.updateMany(condition, { $set: change })
+        return await items.find(condition)
+      });
+    },
+
     async deleteItem(itemId) {
       return await query(async (db) => {
         const items = db.collection('items');
@@ -99,6 +118,18 @@ module.exports = function(config) {
         items.deleteOne({ _id: new ObjectId(itemId) });
         deleted.insertOne(item);
         return item;
+      });
+    },
+
+    async deleteManyItems(itemIds) {
+      return await query(async (db) => {
+        const items = db.collection('items');
+        const deleted = db.collection('deletedItems');
+        const condition = { _id: { $in: itemIds.map(id => new ObjectId(id)) } }
+        const toDelete = await items.find(condition).toArray()
+        await items.deleteMany(condition)
+        await deleted.insertMany(toDelete)
+        return toDelete
       });
     },
 

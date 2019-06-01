@@ -24,6 +24,8 @@ module.exports = function(server, config, db) {
       server.put('/api/item/:id/check', this.check);
       server.put('/api/item/:id/uncheck', this.uncheck);
       server.del('/api/item/:id', this.delete);
+      server.put('/api/items/move', this.moveMany)
+      server.del('/api/items', this.deleteMany)
 
     },
 
@@ -84,6 +86,33 @@ module.exports = function(server, config, db) {
 
       await db.deleteItem(request.params.id);
       response.send(item);
+      next();
+    },
+
+    // PUT: /items/move
+    // Body: { ids: [ 'id1', ... ], new_parent: 'id100' }
+    async moveMany(request, response, next) {
+      const user = await userUtils.getUserFromRestifyRequest(request, db);
+      const items = await db.getItemsByIdsAndOwner(request.body.ids, user._id)
+
+      const newParent = await db.getItemByIdAndOwner(request.body.new_parent, user._id)
+      if (!newParent) next(new Error('Could not identify new parent'));
+
+      await db.updateManyItems(items.map(i => i._id), { parent_id: request.body.new_parent })
+      response.send({ moved: items.map(i => i._id) })
+
+      next();
+    },
+
+    // DELETE: /items
+    // Body: { ids: [ 'id1', ... ] }
+    async deleteMany(request, response, next) {
+      const user = await userUtils.getUserFromRestifyRequest(request, db);
+      const items = await db.getItemsByIdsAndOwner(request.body.ids, user._id)
+
+      await db.deleteManyItems(items.map(i => i._id))
+      response.send({ deleted: items.map(i => i._id) });
+
       next();
     }
 

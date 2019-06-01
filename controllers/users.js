@@ -19,7 +19,7 @@ module.exports = function(server, config, db) {
     // POST: /register
     async register(request, response, next) {
 
-      if (!request.body.username) return next(new Error('No username provided'));
+      if (!request.body.username) return next(new Error('No username provided (did you forget the content-type?)'));
       if (await db.getUserByUsername(request.body.username)) return next(new Error('Username already taken'));
       if (!request.body.password) return next(new Error('No password provided'));
 
@@ -32,7 +32,7 @@ module.exports = function(server, config, db) {
 
     // POST: /login
     async login(request, response, next) {
-      if (!request.body.username) return next(new Error('No username provided'));
+      if (!request.body.username) return next(new Error('No username provided (did you forget the content-type?)'));
       if (!request.body.password) return next(new Error('No password provided'));
 
       const user = await db.getUserByUsername(request.body.username);
