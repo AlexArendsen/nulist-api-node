@@ -99,8 +99,6 @@ module.exports = function(config) {
     },
 
     async updateManyItems(itemIds, change) {
-      console.log('I got these items IDs')
-      console.log(itemIds)
       return await query(async (db) => {
         const items = db.collection('items')
         const condition = { _id: { $in: itemIds.map(i => new ObjectId(i)) } }

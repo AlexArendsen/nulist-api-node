@@ -99,7 +99,7 @@ module.exports = function(server, config, db) {
       if (!newParent) next(new Error('Could not identify new parent'));
 
       await db.updateManyItems(items.map(i => i._id), { parent_id: request.body.new_parent })
-      response.send({ moved: items.map(i => i._id) })
+      response.send({ moved: items.map(i => i._id), to: newParent._id })
 
       next();
     },
