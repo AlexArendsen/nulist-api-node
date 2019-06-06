@@ -45,6 +45,14 @@ const cli = {
   
   'undelete-item': async function(itemId) {
     console.log(await db.undeleteItem(itemId));
+  },
+
+  'delete-item': async function(itemId) {
+    console.log(await db.deleteItem(itemId));
+  },
+
+  'move-to-root': async function(itemId) {
+    console.log(await db.updateManyItems([itemId], { parent_id: null }))
   }
 
 };

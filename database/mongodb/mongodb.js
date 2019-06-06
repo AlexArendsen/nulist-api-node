@@ -103,7 +103,7 @@ module.exports = function(config) {
         const items = db.collection('items')
         const condition = { _id: { $in: itemIds.map(i => new ObjectId(i)) } }
         await items.updateMany(condition, { $set: change })
-        return await items.find(condition)
+        return await items.find(condition).toArray()
       });
     },
 
