@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const userUtils = require('../services/users');
 const bcrypt = require('bcrypt')
+const recaptchaUtils = require('../services/recaptcha.js')
 
 module.exports = function(server, config, db) {
   return {
@@ -19,9 +20,11 @@ module.exports = function(server, config, db) {
     // POST: /register
     async register(request, response, next) {
 
+      if (!(await recaptchaUtils.verify(request.body.recaptcha))) return next(new Error('Could not verify recaptcha'));
       if (!request.body.username) return next(new Error('No username provided (did you forget the content-type?)'));
       if (await db.getUserByUsername(request.body.username)) return next(new Error('Username already taken'));
       if (!request.body.password) return next(new Error('No password provided'));
+      if (request.body.password !== request.body.confirmPassword) return next(new Error('Passwords do not match'));
 
       const hash = await bcrypt.hash(request.body.password, 8);
       const user = await db.createUser(request.body.username, hash);

@@ -146,7 +146,7 @@ module.exports = function(config) {
     async setItemChecked(itemId, checked) {
       return await query(async (db) => {
         const items = db.collection('items');
-        await items.updateOne({ _id: new ObjectId(itemId) }, {$set: {checked: checked}});
+        await items.updateOne({ _id: new ObjectId(itemId) }, {$set: {checked: checked, completed_at: checked ? new Date() : undefined}});
         return await items.findOne({ _id: new ObjectId(itemId)});
       });
     },

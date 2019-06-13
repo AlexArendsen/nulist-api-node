@@ -52,9 +52,12 @@ module.exports = function(server, config, db) {
         checked: false
       };
 
-      await db.createItem(item);
-      response.send(item);
-      next();
+      if (!item.title) next(new Error('Item name cannot be empty'));
+      else {
+        await db.createItem(item);
+        response.send(item);
+        next();
+      }
     },
 
     // PUT: /item
@@ -66,7 +69,11 @@ module.exports = function(server, config, db) {
 
       if(request.body.title) item.title = request.body.title;
       if(request.body.description !== undefined) item.description = request.body.description;
-      if(request.body.parent_id !== undefined) item.parent_id = request.body.parent_id;
+      if(request.body.parent_id !== undefined) {
+        if (item.parent_id === item._id) throw Error('Item cannot be made its own parent');
+        item.parent_id = request.body.parent_id;
+      }
+      item.updated_at = new Date()
 
       await db.updateItem(item);
       response.send(item);
@@ -96,9 +103,11 @@ module.exports = function(server, config, db) {
       const items = await db.getItemsByIdsAndOwner(request.body.ids, user._id)
 
       const newParent = await db.getItemByIdAndOwner(request.body.new_parent, user._id)
+      if (request.body.ids.some(id => id === request.body.new_parent))
+        return next(new Error('Item cannot be made its own parent'));
       if (!newParent) next(new Error('Could not identify new parent'));
 
-      await db.updateManyItems(items.map(i => i._id), { parent_id: request.body.new_parent })
+      await db.updateManyItems(items.map(i => i._id), { parent_id: request.body.new_parent, updated_at: new Date() })
       response.send({ moved: items.map(i => i._id), to: newParent._id })
 
       next();
