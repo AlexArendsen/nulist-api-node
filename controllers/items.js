@@ -1,5 +1,7 @@
 const userUtils = require('../services/users');
 
+const maxItemSizeBytes = 4096;
+
 module.exports = function(server, config, db) {
 
   const _setChecked = async function(request, response, next, checked) {
@@ -46,13 +48,15 @@ module.exports = function(server, config, db) {
       const item = {
         title: request.body.title,
         description: request.body.description,
+        props: request.body.props || {},
         parent_id: request.body.parent_id || undefined,
         created_at: new Date(),
         user_id: user._id,
         checked: false
       };
 
-      if (!item.title) next(new Error('Item name cannot be empty'));
+      if (JSON.stringify(item) > maxItemSizeBytes) next(new Error('Item too large'));
+      else if (!item.title) next(new Error('Item name cannot be empty'));
       else {
         await db.createItem(item);
         response.send(item);
@@ -67,18 +71,20 @@ module.exports = function(server, config, db) {
 
       if (!item) return next(new Error('No such item found'));
 
-      if(request.body.title) item.title = request.body.title;
-      if(request.body.description !== undefined) item.description = request.body.description;
-      if(request.body.parent_id !== undefined) {
-        if (item.parent_id === item._id) throw Error('Item cannot be made its own parent');
-        item.parent_id = request.body.parent_id;
+      const maybeUpdate = (field) => {
+        if (request.body[field] !== undefined) item[field] = request.body[field]
       }
+
+      ['title', 'description', 'parent_id', 'props'].forEach(maybeUpdate)
       item.updated_at = new Date()
 
-      await db.updateItem(item);
-      response.send(item);
-
-      next();
+      if (JSON.stringify(item).length > maxItemSizeBytes) next(new Error('Item too large'))
+      else if (item.parent_id === item._id) next(new Error('Item cannot be its own parent'));
+      else {
+        await db.updateItem(item);
+        response.send(item);
+        next();
+      }
     },
 
     // PUT: /item/:id/(un)check
