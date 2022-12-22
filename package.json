@@ -17,7 +17,7 @@
     "axios": "^0.19.0",
     "bcrypt": "^3.0.6",
     "diskdb": "^0.1.17",
-    "jsonwebtoken": "^8.3.0",
+    "jsonwebtoken": "^9.0.0",
     "mongodb": "^3.1.4",
     "restify": "^7.2.1",
     "restify-cors-middleware": "^1.1.1"
